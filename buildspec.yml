@@ -1,10 +1,5 @@
 version: 0.2
 
-env:
-  variables:
-    # 필요하다면 여기에 환경변수 선언
-    # NODE_ENV: "production"
-
 phases:
   install:
     runtime-versions:
