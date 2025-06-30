@@ -1,6 +1,29 @@
 version: 0.2
 
 phases:
+  pre_build:
+    commands:
+      - echo "Checking GitHub source structure..."
+      - ls -la
+      - echo "Verifying Next.js project files..."
+      - if [ -f "package.json" ]; then echo "✓ package.json found"; else echo "✗ package.json not found"; exit 1; fi
+      - if [ -d "app" ]; then echo "✓ app directory found"; else echo "✗ app directory not found"; exit 1; fi
+      - echo "Checking available source directories..."
+      - ls -la $CODEBUILD_SRC_DIR_*/ 2>/dev/null || echo "No secondary sources found"
+      - echo "Merging deployment files from S3 source..."
+      - echo "Available environment variables:"
+      - env | grep CODEBUILD_SRC_DIR || echo "No CODEBUILD_SRC_DIR variables found"
+      - echo "Copying appspec.yml and scripts from S3 artifact..."
+      - cp $CODEBUILD_SRC_DIR_deployment_source/appspec.yml . || cp $CODEBUILD_SRC_DIR_appspec_source/appspec.yml . || echo "Failed to copy appspec.yml - checking available sources"
+      - cp -r $CODEBUILD_SRC_DIR_deployment_source/scripts . || cp -r $CODEBUILD_SRC_DIR_appspec_source/scripts . || echo "Failed to copy scripts - checking available sources"
+      - echo "Listing all available source directories:"
+      - find $CODEBUILD_SRC_DIR* -type d -maxdepth 1 2>/dev/null || echo "No source directories found"
+      - echo "Setting script permissions..."
+      - chmod +x scripts/*.sh 2>/dev/null || echo "No scripts found to set permissions"
+      - echo "Final verification:"
+      - ls -la appspec.yml 2>/dev/null && echo "✓ appspec.yml merged" || echo "✗ appspec.yml not found"
+      - ls -la scripts/ 2>/dev/null && echo "✓ scripts directory merged" || echo "✗ scripts directory not found"
+
   install:
     runtime-versions:
       nodejs: 20
