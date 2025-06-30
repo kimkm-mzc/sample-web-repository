@@ -38,6 +38,10 @@ echo "Setting permissions..."
 chown -R ec2-user:ec2-user /var/www/html/ai-news-briefing
 chown -R ec2-user:ec2-user /var/log/pm2
 
+# 스크립트 파일들에 실행 권한 부여
+echo "Setting execute permissions for scripts..."
+chmod +x /var/www/html/ai-news-briefing/scripts/*.sh
+
 # 기존 애플리케이션 정리
 echo "Cleaning up existing application..."
 pm2 stop ai-news-briefing 2>/dev/null || true
