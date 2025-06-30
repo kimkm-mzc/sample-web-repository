@@ -3,7 +3,7 @@ module.exports = {
     name: 'ai-news-briefing',
     script: 'npm',
     args: 'start',
-    cwd: '/var/www/html/ai-news-briefing',
+    cwd: '/home/ec2-user/ai-news-briefing',
     instances: 1,
     autorestart: true,
     watch: false,

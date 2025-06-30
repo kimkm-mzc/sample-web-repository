@@ -30,17 +30,17 @@ echo "PM2 version: $(pm2 -v)"
 
 # 애플리케이션 디렉토리 생성
 echo "Creating application directory..."
-mkdir -p /var/www/html/ai-news-briefing
+mkdir -p /home/ec2-user/ai-news-briefing
 mkdir -p /var/log/pm2
 
 # 권한 설정
 echo "Setting permissions..."
-chown -R ec2-user:ec2-user /var/www/html/ai-news-briefing
+chown -R ec2-user:ec2-user /home/ec2-user/ai-news-briefing
 chown -R ec2-user:ec2-user /var/log/pm2
 
 # 스크립트 파일들에 실행 권한 부여
 echo "Setting execute permissions for scripts..."
-chmod +x /var/www/html/ai-news-briefing/scripts/*.sh
+chmod +x /home/ec2-user/ai-news-briefing/scripts/*.sh
 
 # 기존 애플리케이션 정리
 echo "Cleaning up existing application..."

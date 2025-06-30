@@ -2,10 +2,10 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/html/ai-news-briefing
+    destination: /home/ec2-user/ai-news-briefing
     overwrite: yes
 permissions:
-  - object: /var/www/html/ai-news-briefing
+  - object: /home/ec2-user/ai-news-briefing
     pattern: "**"
     owner: ec2-user
     group: ec2-user

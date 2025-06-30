@@ -7,7 +7,7 @@ exec > >(tee -a $LOG_FILE) 2>&1
 echo "Starting server at $(date)"
 
 # 애플리케이션 디렉토리로 이동
-cd /var/www/html/ai-news-briefing
+cd /home/ec2-user/ai-news-briefing
 
 # 환경 변수 파일 설정
 echo "Setting up environment variables..."
@@ -26,7 +26,7 @@ fi
 # 파일 권한 확인
 echo "Checking file permissions..."
 ls -la
-chown -R ec2-user:ec2-user /var/www/html/ai-news-briefing
+chown -R ec2-user:ec2-user /home/ec2-user/ai-news-briefing
 
 # Node.js 애플리케이션 의존성 확인
 echo "Verifying dependencies..."
