@@ -61,16 +61,31 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 echo "Starting application with PM2..."
 pm2 start ecosystem.config.js --env production
 
+# 애플리케이션 시작 확인
+echo "Waiting for application to start..."
+for i in {1..30}; do
+    if pm2 list | grep -q "ai-news-briefing.*online"; then
+        echo "✓ Application started successfully"
+        break
+    fi
+    echo "Waiting for application... ($i/30)"
+    sleep 2
+done
+
 # PM2 설정 저장
 pm2 save
 
-# 시스템 부팅 시 자동 시작 설정
-pm2 startup systemd -u ec2-user --hp /home/ec2-user
+# 시스템 부팅 시 자동 시작 설정 (비대화형 모드)
+pm2 startup systemd -u ec2-user --hp /home/ec2-user 2>/dev/null || echo "PM2 startup configuration skipped"
 
 # 애플리케이션 상태 확인
 sleep 5
+echo "Checking PM2 status..."
 pm2 status
-pm2 logs ai-news-briefing --lines 10
+
+# 로그 확인 (비대화형 모드, 타임아웃 설정)
+echo "Checking application logs..."
+timeout 10 pm2 logs ai-news-briefing --lines 5 --nostream 2>/dev/null || echo "Log check completed"
 
 echo "Server started successfully at $(date)"
 echo "Application should be available at http://localhost:3000"
