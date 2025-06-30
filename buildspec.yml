@@ -28,3 +28,4 @@ artifacts:
     - "package-lock.json"
   # 아티팩트 이름을 고정할 경우 주석 해제
   # name: "ai-news-briefing"
+
