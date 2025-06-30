@@ -24,6 +24,16 @@ phases:
       - rm -rf node_modules
       - echo "Installing production dependencies only..."
       - npm ci --omit=dev
+      - echo "Verifying deployment files..."
+      - ls -la appspec.yml
+      - ls -la scripts/
+      - echo "Setting script permissions..."
+      - chmod +x scripts/*.sh
+      - echo "Verifying script permissions..."
+      - ls -la scripts/install_dependencies.sh
+      - ls -la scripts/start_server.sh
+      - ls -la scripts/stop_server.sh
+      - ls -la scripts/validate_service.sh
       - echo "Creating deployment package..."
       - echo "Build completed at $(date)"
 
@@ -35,9 +45,13 @@ artifacts:
     - "package-lock.json"
     - "next.config.js"
     - "appspec.yml"
-    - "scripts/**/*"
+    - "scripts/install_dependencies.sh"
+    - "scripts/start_server.sh"
+    - "scripts/stop_server.sh"
+    - "scripts/validate_service.sh"
     - "ecosystem.config.js"
     - "types/**/*"
     - ".env.example"
+    - "node_modules/**/*"
   name: ai-news-briefing-$(date +%Y-%m-%d-%H%M%S)
   base-directory: .
