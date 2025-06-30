@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
           source: article.source.name,
           publishedAt: article.publishedAt,
           url: article.url,
-          summary: null,
+          summary: undefined,
         }));
       } catch (apiError: any) {
         console.error('NewsAPI 호출 실패:', apiError);

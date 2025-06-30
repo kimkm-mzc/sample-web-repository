@@ -1,0 +1,1 @@
+{"status":"healthy","timestamp":"2025-06-30T08:41:22.208Z","service":"ai-news-briefing","version":"1.0.0","environment":"production","apis":{"newsApi":true,"openaiApi":true},"uptime":0.543385417,"memory":{"used":14,"total":20}}

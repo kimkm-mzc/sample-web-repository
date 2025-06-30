@@ -122,7 +122,7 @@ export default function Home() {
     }
 
     // 요약 중인 뉴스 ID 추가
-    setSummarizingIds(prev => new Set([...prev, newsId]));
+    setSummarizingIds(prev => new Set(Array.from(prev).concat(newsId)));
 
     if (!isRetry) {
       setRetryCount(prev => ({ ...prev, [newsId]: 0 }));

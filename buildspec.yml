@@ -5,27 +5,39 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      - echo "Installing NPM dependencies…"
+      - echo "Installing NPM dependencies..."
       - npm ci
 
   build:
     commands:
-      - echo "Building the Next.js application…"
+      - echo "Building Next.js application..."
       - npm run build
+      - echo "Build completed successfully"
+      - ls -la .next/
+      - echo "Checking build artifacts..."
+      - ls -la .next/standalone/ || echo "No standalone build found"
 
   post_build:
     commands:
-      - echo "Post-build cleanup…"
-      # 예: 불필요한 dev-deps 제거
+      - echo "Post-build cleanup and optimization..."
+      - echo "Removing development dependencies..."
       - rm -rf node_modules
+      - echo "Installing production dependencies only..."
+      - npm ci --omit=dev
+      - echo "Creating deployment package..."
+      - echo "Build completed at $(date)"
 
 artifacts:
-  # 빌드 결과물로 업로드할 경로
   files:
-    - ".next/**"
-    - "public/**"
+    - ".next/**/*"
+    - "public/**/*"
     - "package.json"
     - "package-lock.json"
-  # 아티팩트 이름을 고정할 경우 주석 해제
-  # name: "ai-news-briefing"
-
+    - "next.config.js"
+    - "appspec.yml"
+    - "scripts/**/*"
+    - "ecosystem.config.js"
+    - "types/**/*"
+    - ".env.example"
+  name: ai-news-briefing-$(date +%Y-%m-%d-%H%M%S)
+  base-directory: .
