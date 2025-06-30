@@ -1,0 +1,35 @@
+version: 0.2
+
+env:
+  variables:
+    # 필요하다면 여기에 환경변수 선언
+    # NODE_ENV: "production"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "Installing NPM dependencies…"
+      - npm ci
+
+  build:
+    commands:
+      - echo "Building the Next.js application…"
+      - npm run build
+
+  post_build:
+    commands:
+      - echo "Post-build cleanup…"
+      # 예: 불필요한 dev-deps 제거
+      - rm -rf node_modules
+
+artifacts:
+  # 빌드 결과물로 업로드할 경로
+  files:
+    - ".next/**"
+    - "public/**"
+    - "package.json"
+    - "package-lock.json"
+  # 아티팩트 이름을 고정할 경우 주석 해제
+  # name: "ai-news-briefing"
