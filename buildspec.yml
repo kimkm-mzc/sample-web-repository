@@ -5,29 +5,33 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      - echo "Installing NPM dependencies…"
-      - npm ci
-
-  pre_build:
-    commands:
-      - echo "Merging CodeDeploy files from S3 source…"
-      - cp "$CODEBUILD_SRC_DIR_WebappSourceArtifacts/appspec.yml" .
-      - cp -r "$CODEBUILD_SRC_DIR_WebappSourceArtifacts/scripts" ./scripts
-      - chmod +x scripts/*.sh
+      - echo "Installing NPM dependencies..."
+      - npm i
 
   build:
     commands:
-      - echo "Building Next.js application…"
+      - echo "Building Next.js application..."
       - npm run build
+      - echo "Build completed successfully"
+      - ls -la .next/
+      - echo "Checking build artifacts..."
+      - ls -la .next/standalone/ || echo "No standalone build found"
 
   post_build:
     commands:
-      - echo "Post-build cleanup and optimization…"
+      - echo "Post-build cleanup and optimization..."
+      - echo "Removing development dependencies..."
       - rm -rf node_modules
+      - echo "Installing production dependencies only..."
       - npm ci --omit=dev
+      - echo "Creating deployment package..."
       - echo "Build completed at $(date)"
+      - ls -R "$CODEBUILD_SRC_DIR_WebappSourceArtifacts"
+      - echo "Merging CodeDeploy files from S3 source…"
+      - cp "$CODEBUILD_SRC_DIR_WebappSourceArtifacts/archive/appspec.yml" .
+      - cp -r "$CODEBUILD_SRC_DIR_WebappSourceArtifacts/archive/scripts" ./scripts
+      - chmod +x scripts/*.sh
 
-# ← 이 줄부터는 phases: 밖, 즉 최상위 레벨입니다.
 artifacts:
   files:
     - ".next/**/*"
@@ -40,5 +44,5 @@ artifacts:
     - "ecosystem.config.js"
     - "types/**/*"
     - ".env.example"
-  base-directory: .
   name: ai-news-briefing-$(date +%Y-%m-%d-%H%M%S)
+  base-directory: .
