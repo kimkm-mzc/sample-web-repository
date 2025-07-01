@@ -5,80 +5,25 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      - echo "Checking primary source structure..."
-      - ls -la
-      - echo "Checking if this is GitHub source (Next.js) or S3 source (appspec)..."
-      - if [ -f "package.json" ] && [ -d "app" ]; then
-        echo "✓ This appears to be GitHub source with Next.js project";
-        elif [ -f "appspec.yml" ] && [ -d "scripts" ]; then
-        echo "✓ This appears to be S3 source with deployment files";
-        else
-        echo "⚠ Unknown source structure";
-        fi
-      - echo "Checking available source directories..."
-      - ls -la $CODEBUILD_SRC_DIR_*/ 2>/dev/null || echo "No secondary sources found"
-      - echo "Merging deployment files from S3 source..."
-      - echo "Available environment variables:"
-      - env | grep CODEBUILD_SRC_DIR || echo "No CODEBUILD_SRC_DIR variables found"
-      - echo "Checking WebappSourceArtifacts contents:"
-      - ls -la $CODEBUILD_SRC_DIR_WebappSourceArtifacts/ || echo "WebappSourceArtifacts directory not accessible"
-      - echo "Copying appspec.yml and scripts from S3 artifact..."
-      - echo "Trying to copy from WebappSourceArtifacts directory..."
-      - ls -la $CODEBUILD_SRC_DIR_WebappSourceArtifacts/
-      - cp $CODEBUILD_SRC_DIR_WebappSourceArtifacts/appspec.yml . || echo "Failed to copy appspec.yml from WebappSourceArtifacts"
-      - cp -r $CODEBUILD_SRC_DIR_WebappSourceArtifacts/scripts . || echo "Failed to copy scripts from WebappSourceArtifacts"
-      - echo "Setting script permissions..."
-      - chmod +x scripts/*.sh 2>/dev/null || echo "No scripts found to set permissions"
-      - echo "Final verification:"
-      - ls -la appspec.yml 2>/dev/null && echo "✓ appspec.yml merged" || echo "✗ appspec.yml not found"
-      - ls -la scripts/ 2>/dev/null && echo "✓ scripts directory merged" || echo "✗ scripts directory not found"
-      - echo "Installing NPM dependencies..."
-      - npm ci
+      - echo "Installing production dependencies…"
+      - npm ci --omit=dev
 
   build:
     commands:
-      - echo "Building Next.js application..."
-      - npm run build
-      - echo "Build completed successfully"
-      - ls -la .next/
-      - echo "Checking build artifacts..."
-      - ls -la .next/standalone/ || echo "No standalone build found"
-
-  post_build:
-    commands:
-      - echo "Post-build cleanup and optimization..."
-      - echo "Removing development dependencies..."
-      - rm -rf node_modules
-      - echo "Installing production dependencies only..."
-      - npm ci --omit=dev
-      - echo "Verifying deployment files..."
-      - ls -la appspec.yml
-      - ls -la scripts/
-      - echo "Setting script permissions..."
+      - echo "Merging CodeDeploy files from S3 source…"
+      - cp $CODEBUILD_SRC_DIR_WebappSourceArtifacts/appspec.yml .
+      - cp -r $CODEBUILD_SRC_DIR_WebappSourceArtifacts/scripts ./scripts
       - chmod +x scripts/*.sh
-      - echo "Verifying script permissions..."
-      - ls -la scripts/install_dependencies.sh
-      - ls -la scripts/start_server.sh
-      - ls -la scripts/stop_server.sh
-      - ls -la scripts/validate_service.sh
-      - echo "Creating deployment package..."
-      - echo "Build completed at $(date)"
+      - echo "Building Next.js app…"
+      - npm run build
 
 artifacts:
-  files:
-    - ".next/**/*"
-    - "public/**/*"
-    - "package.json"
-    - "package-lock.json"
-    - "next.config.js"
-    - "appspec.yml"
-    - "scripts/install_dependencies.sh"
-    - "scripts/start_server.sh"
-    - "scripts/stop_server.sh"
-    - "scripts/validate_service.sh"
-    - "ecosystem.config.js"
-    - "types/**/*"
-    - ".env.example"
-    - "node_modules/**/*"
-  name: ai-news-briefing-$(date +%Y-%m-%d-%H%M%S)
   base-directory: .
+  files:
+    - appspec.yml
+    - scripts/**/*
+    - .next/**/*
+    - public/**/*
+    - package.json
+    - package-lock.json
+    - next.config.js
